@@ -276,6 +276,12 @@ void mainWindow::createActions()
   setConfigAction->setStatusTip(tr("Set advanced runtime configuration options"));
   connect(setConfigAction, SIGNAL(triggered()), this, SLOT(SetConfigOption()));
 
+  writeConfigFileAction = new QAction(tr("Write CLI Config File"), this);
+  writeConfigFileAction->setIcon(QIcon(":disk.png"));
+  writeConfigFileAction->setStatusTip(tr("Write a configuration file from GUI inputs for use in the CLI"));
+  connect(writeConfigFileAction, SIGNAL(triggered()), this, SLOT(WriteConfigFile()));
+
+
   //wind ninja help action
   windNinjaHelpAction = new QAction(tr("WindNinja &Help"), this);
   windNinjaHelpAction->setIcon(QIcon(":help.png"));
@@ -397,6 +403,7 @@ void mainWindow::createMenus()
   //toolsMenu->addAction(resampleAction);
   toolsMenu->addAction(writeBlankStationFileAction);
   toolsMenu->addAction(setConfigAction);
+  toolsMenu->addAction(writeConfigFileAction);
 
   //help/tutorial menus
   helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -2713,5 +2720,12 @@ void mainWindow::SetConfigOption()
     qDebug() << "Setting config option " << key << "to" << val;
     pszKey = CPLSPrintf( "%s", (char*)key.toLocal8Bit().data() );
     CPLSetConfigOption( pszKey, pszVal );
+}
+
+void mainWindow::WriteConfigFile()
+{
+  QString fileName = QFileDialog::getSaveFileName
+    (this, tr("Save config file as..."), "windninja-config.cfg",
+     tr("Text Files (*.cfg)"));
 }
 

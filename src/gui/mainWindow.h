@@ -217,6 +217,7 @@ class mainWindow : public QMainWindow
 #endif
 
   void SetConfigOption();
+  void WriteConfigFile();
 
  protected:
   void closeEvent(QCloseEvent *event);
@@ -229,6 +230,7 @@ class mainWindow : public QMainWindow
   QAction *rddsAction;
   QAction *writeBlankStationFileAction;
   QAction *setConfigAction;
+  QAction *writeConfigFileAction;
   QAction *rddsInstructAction;
   QAction *resampleAction;
   QAction *windNinjaHelpAction;
