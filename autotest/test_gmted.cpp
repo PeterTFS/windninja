@@ -110,7 +110,8 @@ BOOST_AUTO_TEST_CASE( us )
 
     BOOST_REQUIRE_MESSAGE( NULL != fetch, "GetSurfaceFetch returned NULL" );
 
-    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL);
+    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL,
+                                     NULL);
 
     BOOST_REQUIRE( rc >= 0 );
 
@@ -165,7 +166,7 @@ BOOST_AUTO_TEST_CASE( world )
     fetch = FetchFactory::GetSurfaceFetch(FetchFactory::WORLD_GMTED);
 
     int rc = fetch->FetchPoint( adfCenter, adfBuffer, lengthUnits::kilometers,
-                               90.0, pszFilename.c_str(), NULL );
+                               90.0, pszFilename.c_str(), NULL, NULL );
 
     BOOST_REQUIRE( rc >= 0 );
 

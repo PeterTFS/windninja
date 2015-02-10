@@ -39,7 +39,9 @@ public:
     GDALFetch(std::string path);
     virtual ~GDALFetch();
     virtual SURF_FETCH_E FetchBoundingBox(double *bbox, double resolution,
-                                          const char *filename, char **options);
+                                          const char *filename,
+                                          GDALProgressFunc pfnProgress,
+                                          char **options);
 protected:
     SURF_FETCH_E Initialize();
 };

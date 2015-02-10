@@ -136,7 +136,9 @@ public:
     LandfireClient();
     ~LandfireClient();
     virtual SURF_FETCH_E FetchBoundingBox(double *bbox, double resolution,
-                                          const char *filename, char **options);
+                                          const char *filename,
+                                          GDALProgressFunc pfnProgress,
+                                          char **options);
 private:
     LandfireClient( LandfireClient &oOther ) { (void)oOther; }
 

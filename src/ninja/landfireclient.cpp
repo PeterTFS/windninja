@@ -108,6 +108,7 @@ LandfireClient::~LandfireClient()
 
 SURF_FETCH_E LandfireClient::FetchBoundingBox( double *bbox, double resolution,
                                                const char *filename,
+                                               GDALProgressFunc pfnProgress,
                                                char **options )
 {
     (void)resolution;

@@ -467,12 +467,12 @@ int main(int argc, char *argv[])
             Usage();
         }
         nSrtmError = fetch->FetchBoundingBox(adfBbox, dfCellSize, pszDstFile,
-                                             papszOptions);
+                                             NULL, papszOptions);
     }
     else
     {
         nSrtmError = fetch->FetchPoint(adfPoint, adfBuff, units, dfCellSize,
-                                       pszDstFile, papszOptions);
+                                       pszDstFile, NULL, papszOptions);
     }
 
     if(nSrtmError < 0)

@@ -95,12 +95,13 @@ std::string SurfaceFetch::GetPath()
 SURF_FETCH_E SurfaceFetch::FetchPoint(double *point, double *buffer,
                                       lengthUnits::eLengthUnits units,
                                       double resolution, const char *filename,
+                                      GDALProgressFunc pfnProgress,
                                       char **options)
 {
     double bbox[4];
     CreateBoundingBox(point, buffer, units, bbox);
     int nNoDataCount = FetchBoundingBox(bbox, resolution, filename,
-                                        options);
+                                        pfnProgress, options);
 
     return nNoDataCount;
 }

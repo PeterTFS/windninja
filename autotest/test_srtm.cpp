@@ -113,7 +113,8 @@ BOOST_AUTO_TEST_CASE( us_box )
     fetch = FetchFactory::GetSurfaceFetch(FetchFactory::US_SRTM);
     BOOST_REQUIRE_MESSAGE( NULL != fetch, "GetSurfaceFetch returned NULL" );
 
-    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL);
+    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL,
+                                     NULL);
 
     BOOST_REQUIRE( rc >= 0 );
 
@@ -174,7 +175,7 @@ BOOST_AUTO_TEST_CASE( world_point )
     BOOST_REQUIRE_MESSAGE( NULL != fetch, "GetSurfaceFetch returned NULL" );
 
     int rc = fetch->FetchPoint( adfCenter, adfBuffer, lengthUnits::kilometers,
-                                90.0, pszFilename.c_str(), NULL );
+                                90.0, pszFilename.c_str(), NULL, NULL );
     BOOST_REQUIRE( rc >= 0 );
 
     poDS = (GDALDataset*) GDALOpen( pszFilename.c_str(), GA_Update );
@@ -226,7 +227,8 @@ BOOST_AUTO_TEST_CASE( world_box )
     SurfaceFetch *fetch =
         FetchFactory::GetSurfaceFetch(FetchFactory::WORLD_SRTM);
 
-    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL);
+    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL,
+                                     NULL);
     delete fetch;
     if(rc < 0)
         return rc;
@@ -269,7 +271,8 @@ BOOST_AUTO_TEST_CASE( gdal )
 
     fetch = FetchFactory::GetSurfaceFetch(FetchFactory::CUSTOM_GDAL, osPath.c_str() );
 
-    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL);
+    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL,
+                                     NULL);
     BOOST_REQUIRE( rc >= 0 );
 
     poDS = (GDALDataset*)GDALOpen(pszFilename.c_str(), GA_Update);

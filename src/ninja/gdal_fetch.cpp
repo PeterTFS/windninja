@@ -92,6 +92,7 @@ int GDALFetch::Initialize()
  */
 SURF_FETCH_E GDALFetch::FetchBoundingBox(double *bbox, double resolution,
                                          const char *filename,
+                                         GDALProgressFunc pfnProgress,
                                          char **options)
 {
     /* parse options */
@@ -211,8 +212,8 @@ SURF_FETCH_E GDALFetch::FetchBoundingBox(double *bbox, double resolution,
     GDALWarpOperation oOperation;
 
     oOperation.Initialize( psWarpOptions );
-    eErr = oOperation.ChunkAndWarpImage( 0, 0, 
-                                         GDALGetRasterXSize( hDstDS ), 
+    eErr = oOperation.ChunkAndWarpMulti( 0, 0,
+                                         GDALGetRasterXSize( hDstDS ),
                                          GDALGetRasterYSize( hDstDS ) );
 
     GDALDestroyGenImgProjTransformer( psWarpOptions->pTransformerArg );

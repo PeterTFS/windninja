@@ -1273,7 +1273,8 @@ void WidgetDownloadDEM::closeDEM()
  */
 int WidgetDownloadDEM::fetchBoundBox(double *boundsBox, const char *fileName, double resolution)
 {
-    int result = fetcher->FetchBoundingBox(boundsBox, resolution, fileName, NULL);
+    int result = fetcher->FetchBoundingBox(boundsBox, resolution, fileName, NULL,
+                                           NULL);
     return result;
 }          
 

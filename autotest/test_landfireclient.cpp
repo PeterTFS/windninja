@@ -100,7 +100,8 @@ BOOST_AUTO_TEST_CASE( mackay )
     adfBbox[2] =   43.7832152227745;
     adfBbox[3] = -113.749693430469;
 
-    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL );
+    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL,
+                                          NULL );
     BOOST_CHECK( CPLCheckForFile( (char*)osLcpFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( CPLCheckForFile( (char*)osPrjFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( rc == 0 );
@@ -115,7 +116,8 @@ BOOST_AUTO_TEST_CASE( alaska )
     adfBbox[2] = 63.78351;
     adfBbox[3] = -146.769276;
 
-    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL );
+    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL,
+                                          NULL );
     BOOST_CHECK( CPLCheckForFile( (char*)osLcpFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( CPLCheckForFile( (char*)osPrjFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( rc == 0 );
@@ -130,7 +132,8 @@ BOOST_AUTO_TEST_CASE( alaska_bad_geom )
     adfBbox[2] = 67.17;
     adfBbox[3] = -149.99;
 
-    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL );
+    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL,
+                                          NULL );
     BOOST_CHECK( CPLCheckForFile( (char*)osLcpFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( CPLCheckForFile( (char*)osPrjFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( rc == 0 );
@@ -146,7 +149,8 @@ BOOST_AUTO_TEST_CASE( alaska_out )
     adfBbox[3] = -157.5511;
 
     CPLPushErrorHandler( CPLQuietErrorHandler );
-    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL );
+    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL,
+                                          NULL );
     CPLPopErrorHandler();
     BOOST_CHECK( rc == SURF_FETCH_E_BAD_INPUT );
 }
@@ -159,7 +163,8 @@ BOOST_AUTO_TEST_CASE( hawaii )
     adfBbox[2] =  19.7345;
     adfBbox[3] = -155.400;
 
-    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL );
+    int rc = lfcFetcher.FetchBoundingBox( adfBbox, 0.0, osLcpFile.c_str() , NULL,
+                                          NULL );
     BOOST_CHECK( CPLCheckForFile( (char*)osLcpFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( CPLCheckForFile( (char*)osPrjFile.c_str(), NULL ) == TRUE );
     BOOST_CHECK( rc == 0 );

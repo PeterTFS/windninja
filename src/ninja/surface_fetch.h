@@ -62,11 +62,13 @@ public:
 
     virtual SURF_FETCH_E FetchBoundingBox(double *bbox, double resolution,
                                           const char *filename,
+                                          GDALProgressFunc pfnProgress,
                                           char **options) = 0;
 
     virtual SURF_FETCH_E FetchPoint(double *point, double *buffer,
                                     lengthUnits::eLengthUnits units,
                                     double resolution, const char *filename,
+                                    GDALProgressFunc pfnProgress,
                                     char **options);
     virtual SURF_FETCH_E GetCorners(double *northeast, double *southeast,
                                     double *southwest, double *northwest);

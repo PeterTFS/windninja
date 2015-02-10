@@ -744,7 +744,8 @@ int windNinjaCLI(int argc, char* argv[])
                 bbox[3] = west;
 
                 nSrtmError = fetch->FetchBoundingBox(bbox, 30.0,
-                                                     new_elev.c_str(), NULL);
+                                                     new_elev.c_str(), 
+                                                     NULL, NULL);
 
             }
             else
@@ -788,7 +789,8 @@ int windNinjaCLI(int argc, char* argv[])
                     buffer_units = lengthUnits::kilometers;
 
                 nSrtmError = fetch->FetchPoint(center, buffer, buffer_units,
-                                               30.0, new_elev.c_str(), NULL);
+                                               30.0, new_elev.c_str(), NULL,
+                                               NULL);
             }
 
             if(nSrtmError < 0)

@@ -111,7 +111,8 @@ BOOST_AUTO_TEST_CASE( us_box )
     fetch = FetchFactory::GetSurfaceFetch(FetchFactory::CUSTOM_GDAL, pszPath );
     BOOST_REQUIRE_MESSAGE( NULL != fetch, "GetSurfaceFetch returned NULL" );
 
-    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL);
+    int rc = fetch->FetchBoundingBox(adfBbox, 30.0, pszFilename.c_str(), NULL,
+                                     NULL);
 
     BOOST_REQUIRE( rc >= 0 );
 
