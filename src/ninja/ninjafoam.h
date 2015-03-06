@@ -98,9 +98,10 @@ private:
     void ComputeDirection(); //converts direction from degrees to unit vector notation
     void SetInlets();
     void SetBcs();
-    int writeTerrainBlockMesh();
+    int writeMoveDynamicMesh();
     int writeBlockMesh();
-    int readLogFile(int &ratio);
+    int readDem(int &ratio_); //sets blockMesh data from DEM 
+    int readLogFile(int &ratio); //sets blockMesh data from STL log file when DEM not available
     int writeSnappyMesh();
     
     std::string boundary_name;
@@ -120,10 +121,11 @@ private:
     
     int ReplaceKey(std::string &s, std::string k, std::string v);
     int ReplaceKeys(std::string &s, std::string k, std::string v, int n = INT_MAX);
+    int CopyFile(const char *pszInput, const char *pszOutput);
     
     int SurfaceTransformPoints();
     int SurfaceCheck();
-    int TerrainBlockMesher();
+    int MoveDynamicMesh();
     int BlockMesh();
     int DecomposePar(VSILFILE *fout);
     int SnappyHexMesh();
