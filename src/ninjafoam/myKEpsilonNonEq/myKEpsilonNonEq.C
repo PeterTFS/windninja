@@ -256,7 +256,7 @@ void myKEpsilonNonEq::correct()
 
     RASModel::correct();
 
-    volScalarField G("myKEpsilonNonEq.G",nut_*2*magSqr(symm(fvc::grad(U_))));
+    volScalarField G("myKEpsilonNonEq:G",nut_*2*magSqr(symm(fvc::grad(U_))));
 
 #   include "wallFunctionsI.H"
 
