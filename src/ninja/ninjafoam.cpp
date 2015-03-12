@@ -126,13 +126,16 @@ bool NinjaFoam::simulate_wind()
 
     status = GenerateTempDirectory();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error generating the NINJAFOAM directory.");
+        return NINJA_E_OTHER;
     }
 
     //writes *most* of the foam files, but not all can be written at this point
     status = WriteFoamFiles();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during WriteFoamFiles().");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     //write controlDict for flow solution--this will get modified during moveDynamicMesh
@@ -170,16 +173,19 @@ bool NinjaFoam::simulate_wind()
                         NULL);
 
     if(eErr != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while converting DEM to STL format.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     checkCancel();
 
     if(input.stlFile != "!set"){
         status = ReadStl();
-
         if(status != 0){
-        //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during ReadStl().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
 
@@ -190,25 +196,33 @@ bool NinjaFoam::simulate_wind()
     //set working directory to pszTempPath
     status = chdir(pszTempPath);
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while moving into NINJFOAM directory.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Transforming surface points to output wind height...");
     status = SurfaceTransformPoints();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during surfaceTransformPoints().");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Checking surface points in original terrain file...");
     status = SurfaceCheck();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during SurfaceCheck().");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     //move back to ninja working directory
     status = chdir("../");
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while moving out of NINJAFOAM directory.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     checkCancel();
@@ -225,11 +239,15 @@ bool NinjaFoam::simulate_wind()
         //reads from log.json created from surfaceCheck
         status = writeBlockMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during writeBlcokMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
         status = writeMoveDynamicMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during writeMoveDynamicMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
     else{ //use snappyHexMesh
@@ -243,12 +261,16 @@ bool NinjaFoam::simulate_wind()
         //reads from log.json created from surfaceCheck
         status = writeBlockMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during writeBlockMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
 
         status = writeSnappyMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during writeSnappyMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
 
@@ -263,7 +285,9 @@ bool NinjaFoam::simulate_wind()
     //set working directory to pszTempPath
     status = chdir(pszTempPath);
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while moving into NINJAFOAM directory.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     #ifdef _OPENMP
@@ -275,18 +299,24 @@ bool NinjaFoam::simulate_wind()
     if(input.meshType == WindNinjaInputs::MDM){ //use moveDynamicMesh
         status = MoveDynamicMesh();
         if(status != 0){
-        //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during moveDynamicMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
     else{ // use snappyHexMesh
         status = BlockMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during blockMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
         input.Com->ninjaCom(ninjaComClass::ninjaNone, "Running snappyHexMesh...");
         status = SnappyHexMesh();
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during snappyHexMesh().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
 
@@ -298,7 +328,9 @@ bool NinjaFoam::simulate_wind()
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Checking mesh...");
     status = CheckMesh();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during checkMesh().");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     /*-------------------------------------------------------------------*/
@@ -313,7 +345,9 @@ bool NinjaFoam::simulate_wind()
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Applying initial conditions...");
     status = ApplyInit();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during applyInit().");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
 
@@ -334,7 +368,9 @@ bool NinjaFoam::simulate_wind()
         fout = VSIFOpenL("log", "w" );
         status = DecomposePar(fout);
         if(status != 0){
-            //do something
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during decomposePar().");
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
 
@@ -343,7 +379,9 @@ bool NinjaFoam::simulate_wind()
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Solving for the flow field...");
     status = SimpleFoam();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during simpleFoam(). Try a finer resolution mesh.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     if(input.numberCPUs > 1){
@@ -351,9 +389,9 @@ bool NinjaFoam::simulate_wind()
         fout = VSIFOpenL("log", "w");
         status = ReconstructPar("-latestTime", fout);
         if(status != 0){
-            //do something
             input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during ReconstructPar(). Check that number of iterations is a multiple of 100.");
-            return false;
+            NinjaUnlinkTree( pszTempPath );
+            return NINJA_E_OTHER;
         }
     }
 
@@ -369,7 +407,9 @@ bool NinjaFoam::simulate_wind()
     input.Com->ninjaCom(ninjaComClass::ninjaNone, "Sampling at requested output height...");
     status = Sample();
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while sampling the output.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     #ifdef _OPENMP
@@ -379,7 +419,9 @@ bool NinjaFoam::simulate_wind()
     //move back to ninja working directory
     status = chdir("../");
     if(status != 0){
-        //do something
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error while moving out of NINJAFOAM directory.");
+        NinjaUnlinkTree( pszTempPath );
+        return NINJA_E_OTHER;
     }
 
     /*----------------------------------------*/
@@ -393,9 +435,9 @@ bool NinjaFoam::simulate_wind()
 	input.Com->ninjaCom(ninjaComClass::ninjaNone, "Writing output files...");
 
 	status = WriteOutputFiles();
-    if(status != 1){
+    if(status != 0){
         input.Com->ninjaCom(ninjaComClass::ninjaNone, "Error during output file writing.");
-        return false;
+        return NINJA_E_OTHER;
     }
 
     #ifdef _OPENMP
@@ -426,7 +468,7 @@ bool NinjaFoam::simulate_wind()
 	    VelocityGrid.deallocate();
     }
 
-    return true;
+    return NINJA_SUCCESS;
 }
 
 int NinjaFoam::AddBcBlock(std::string &dataString)
@@ -1275,7 +1317,8 @@ int NinjaFoam::writeMoveDynamicMesh()
     CPLFree(data);
     VSIFCloseL(fin);
     VSIFCloseL(fout);
-
+    
+    return NINJA_SUCCESS;
 }
 
 int NinjaFoam::writeSnappyMesh()
@@ -1506,7 +1549,7 @@ int NinjaFoam::MoveDynamicMesh()
     if(input.numberCPUs > 1){
 
         input.Com->ninjaCom(ninjaComClass::ninjaNone, "Decomposing domain for parallel mesh calculations...");
-        fout = VSIFOpenL("logMesh", "w");
+        fout = VSIFOpenL("logMesh", "w"); //closed in DecomposePar
         nRet = DecomposePar(fout);
         if(nRet != 0){
             //do something
@@ -1543,8 +1586,8 @@ int NinjaFoam::MoveDynamicMesh()
         CPL_FILE_HANDLE out_child = CPLSpawnAsyncGetInputFileHandle(sp);
 
         char data[PIPE_BUFFER_SIZE + 1];
-        int pos;
-        std::string s;
+        int pos, nchar, startPos;
+        std::string s, ss;
 
         /* Track progress */
         while(CPLPipeRead(out_child, &data, sizeof(data)-1)){
@@ -1569,14 +1612,14 @@ int NinjaFoam::MoveDynamicMesh()
                 }
             }*/
 
-            std::string ss;
-            int nchar;
-
-            if(s.rfind("Time = ") != s.npos){
-                pos = s.rfind("Time = ");
+            if(s.rfind("GAMG") != s.npos){
+                if(s.rfind("Time = ") != s.npos){
+                    startPos = s.rfind("GAMG", s.npos);
+                    pos = s.rfind("Time = ", startPos);
                     nchar = s.find('\n', pos) - (pos+7);
                     ss = s.substr( (pos+7), nchar );
                     input.Com->ninjaCom(ninjaComClass::ninjaNone, "(moveDynamicMesh) %.0f%% complete...", atof(ss.c_str())*2);
+                }
             }
         }
         nRet = CPLSpawnAsyncFinish(sp, TRUE, FALSE);
@@ -1590,11 +1633,8 @@ int NinjaFoam::MoveDynamicMesh()
         CopyFile(pszInput, pszOutput);
 
         input.Com->ninjaCom(ninjaComClass::ninjaNone, "Reconstructing domain...");
-        fout = VSIFOpenL("logMesh", "w");
+        fout = VSIFOpenL("logMesh", "w"); //closed in ReconstructPar
         nRet = ReconstructPar("-latestTime", fout);
-
-        //VSIFCloseL(fout);
-
         if(nRet != 0){
             //do something
         }
@@ -1607,12 +1647,35 @@ int NinjaFoam::MoveDynamicMesh()
         CopyFile(pszInput, pszOutput);
 
         const char *const papszArgv[] = { "moveDynamicMesh", NULL };
+        
+        CPLSpawnedProcess *sp = CPLSpawnAsync(NULL, papszArgv, FALSE, TRUE, TRUE, NULL);
+        CPL_FILE_HANDLE out_child = CPLSpawnAsyncGetInputFileHandle(sp);
 
-        VSILFILE *fout = VSIFOpenL("log.moveDynamicMesh", "w");
+        char data[PIPE_BUFFER_SIZE + 1];
+        int pos;
+        std::string s, ss;
+        int nchar, startPos;
 
-        nRet = CPLSpawn(papszArgv, NULL, fout, TRUE);
-
-        //VSIFCloseL(fout);
+        /* Track progress */
+        while(CPLPipeRead(out_child, &data, sizeof(data)-1)){
+            data[sizeof(data)-1] = '\0';
+            CPLDebug("NINJAFOAM", "moveDynamicMesh: %s", data);
+            s.append(data);
+            if(s.rfind("GAMG") != s.npos){
+                if(s.rfind("Time = ") != s.npos){
+                    startPos = s.rfind("GAMG", s.npos);
+                    pos = s.rfind("Time = ", startPos);
+                    nchar = s.find('\n', pos) - (pos+7);
+                    ss = s.substr( (pos+7), nchar );
+                    input.Com->ninjaCom(ninjaComClass::ninjaNone, "(moveDynamicMesh) %.0f%% complete...", atof(ss.c_str())*2);
+                }
+            }
+        }
+        
+        nRet = CPLSpawnAsyncFinish(sp, TRUE, FALSE);
+        if(nRet != 0){
+            //do something
+        }
 
         //re-write controlDict for flow solution
         pszInput = CPLFormFilename("system", "controlDict_simpleFoam", "");
@@ -1636,8 +1699,6 @@ int NinjaFoam::MoveDynamicMesh()
     pszInput = CPLFormFilename("0", "epsilon", "");
     pszOutput = CPLFormFilename("50", "epsilon", "");
     CopyFile(pszInput, pszOutput);
-
-    //VSIFCloseL(fout);
 
     return nRet;
 }
@@ -1967,10 +2028,9 @@ int NinjaFoam::SimpleFoam()
     int nRet = -1;
 
     char data[PIPE_BUFFER_SIZE + 1];
-    int pos;
+    int pos, startPos;
     std::string s, t;
     double p;
-
 
     if(input.numberCPUs > 1){
         #ifdef WIN32
@@ -2000,11 +2060,14 @@ int NinjaFoam::SimpleFoam()
             data[sizeof(data)-1] = '\0';
             s.append(data);
             CPLDebug("NINJAFOAM", "simpleFoam: %s", data);
-            pos = s.rfind("Time = ");
-            if(pos != s.npos && s.npos > (pos + 12) && s.rfind("\n", pos) == (pos-1)){
-                t = s.substr(pos+7, (s.find("\n", pos+7) - (pos+7)));
-                p = atof(t.c_str()) / input.nIterations * 100;
-                input.Com->ninjaCom(ninjaComClass::ninjaNone, "(solver) %.0f%% complete...", p);
+            if(s.rfind("smoothSolver") != s.npos){
+                startPos = s.rfind("smoothSolver");
+                pos = s.rfind("Time = ", startPos);
+                if(pos != s.npos && s.npos > (pos + 12) && s.rfind("\n", pos) == (pos-1)){
+                    t = s.substr(pos+7, (s.find("\n", pos+7) - (pos+7)));
+                    p = atof(t.c_str()) / input.nIterations * 100;
+                    input.Com->ninjaCom(ninjaComClass::ninjaSolverProgress, "%d", (int)p);
+                }
             }
         }
         nRet = CPLSpawnAsyncFinish(sp, TRUE, FALSE);
@@ -2019,11 +2082,15 @@ int NinjaFoam::SimpleFoam()
         while(CPLPipeRead(out_child, &data, sizeof(data)-1)){
             data[sizeof(data)-1] = '\0';
             s.append(data);
-            pos = s.rfind("Time = ");
-            if(pos != s.npos && s.npos > (pos + 12) && s.rfind("\n", pos) == (pos-1)){
-                t = s.substr(pos+7, (s.find("\n", pos+7) - (pos+7)));
-                p = atof(t.c_str()) / input.nIterations * 100;
-                input.Com->ninjaCom(ninjaComClass::ninjaNone, "(solver) %.0f%% complete...", p);
+            
+            if(s.rfind("smoothSolver") != s.npos){
+                startPos = s.rfind("smoothSolver");
+                pos = s.rfind("Time = ", startPos);
+                if(pos != s.npos && s.npos > (pos + 12) && s.rfind("\n", pos) == (pos-1)){
+                    t = s.substr(pos+7, (s.find("\n", pos+7) - (pos+7)));
+                    p = atof(t.c_str()) / input.nIterations * 100;
+                    input.Com->ninjaCom(ninjaComClass::ninjaNone, "(solver) %.0f%% complete...", p);
+                }
             }
         }
         nRet = CPLSpawnAsyncFinish(sp, TRUE, FALSE);
@@ -2740,7 +2807,7 @@ int NinjaFoam::WriteOutputFiles()
         NinjaUnlinkTree( pszTempPath );
     }
 
-	return true;
+	return NINJA_SUCCESS;
 }
 
 int NinjaFoam::ReadStl()
@@ -2786,5 +2853,5 @@ int NinjaFoam::ReadStl()
         //do something
     }
 
-    return true;
+    return NINJA_SUCCESS;
 }
