@@ -5203,14 +5203,20 @@ void ninja::set_MeshCount(int meshCount)
 
 void ninja::set_MeshCount(WindNinjaInputs::eNinjafoamMeshChoice meshChoice)
 {
+    /* Note that these are not final mesh counts, but are the number of 
+     * cells used in the blockMesh. Final total number of cells is larger
+     * due to surface refinement after moveDynamicMesh. Also note that
+     * increasing these values may cause moveDynamicMesh to crash
+     * for some terrains, especially terrains with small extents/dz's.
+     */
     if(meshChoice == WindNinjaInputs::coarse){
-        input.meshCount = 100000;
+        input.meshCount = 10000;
     }
     else if(meshChoice == WindNinjaInputs::medium){
-        input.meshCount = 500000;
+        input.meshCount = 50000;
     }
     else if(meshChoice == WindNinjaInputs::fine){
-        input.meshCount = 1e6;
+        input.meshCount = 100000;
     }
     else{
         throw std::range_error("The mesh resolution choice has been set improperly.");
@@ -6178,6 +6184,32 @@ void ninja::set_vtkOutFlag(bool flag)
     input.volVTKOutFlag = flag;
 }
 
+void ninja::set_outputPath(std::string path)
+{
+    VSIStatBufL sStat;
+    VSIStatL( path.c_str(), &sStat );
+    const char *pszTestPath = CPLFormFilename(path.c_str(), "test", "");
+    int nRet;
+    
+    if( VSI_ISDIR( sStat.st_mode ) ){
+        //see if we can write to this path
+        nRet = VSIMkdir(pszTestPath, 0777);
+        if(nRet == 0){
+            VSIRmdir(pszTestPath);
+            input.customOutputPath = path;
+        }
+        else{
+            input.Com->ninjaCom(ninjaComClass::ninjaNone, 
+            CPLSPrintf("Cannot write to path %s. Do you have write permission on this directory? Writing outputs to default location...", path.c_str()));
+        }
+    }
+    else{
+        input.Com->ninjaCom(ninjaComClass::ninjaNone, 
+            CPLSPrintf("The path %s does not exist, writing outputs to default location...", path.c_str()));
+    }
+        
+}
+
 void ninja::set_outputFilenames(double& meshResolution,
                                 lengthUnits::eLengthUnits meshResolutionUnits)
 {
@@ -6218,25 +6250,26 @@ void ninja::set_outputFilenames(double& meshResolution,
 #endif
 
     std::string pathName;
-    if( input.initializationMethod == WindNinjaInputs::wxModelInitializationFlag )	//prepend directory paths to rootFile for wxModel run
-    {
-        std::string baseName(CPLGetBasename(input.dem.fileName.c_str()));
-        pathName = CPLGetPath(input.forecastFilename.c_str());
-        
-        //if it's a .tar, write to directory containing the .tar file
-        if( strstr(pathName.c_str(), ".tar") ){
-            pathName.erase( pathName.rfind("/") );
-            rootFile = CPLFormFilename(pathName.c_str(), baseName.c_str(), NULL);
+    std::string baseName(CPLGetBasename(input.dem.fileName.c_str()));
+    
+    if(input.customOutputPath == "!set"){ // if a custom output path was not specified in the cli
+        if( input.initializationMethod == WindNinjaInputs::wxModelInitializationFlag )	//prepend directory paths to rootFile for wxModel run
+        {
+            pathName = CPLGetPath(input.forecastFilename.c_str());
+            //if it's a .tar, write to directory containing the .tar file
+            if( strstr(pathName.c_str(), ".tar") ){
+                pathName.erase( pathName.rfind("/") );
+            }
+        }else{
+            pathName = CPLGetPath(input.dem.fileName.c_str());
         }
-        else{
-            rootFile = CPLFormFilename(pathName.c_str(), baseName.c_str(), NULL);
-        }
-    }else{
-        std::string baseName(CPLGetBasename(input.dem.fileName.c_str()));
-        pathName = CPLGetPath(input.dem.fileName.c_str());
-        rootFile = CPLFormFilename(pathName.c_str(), baseName.c_str(), NULL);
     }
-
+    else{ // if a custom output path was specified in the cli
+        pathName = input.customOutputPath;
+    }
+    
+    rootFile = CPLFormFilename(pathName.c_str(), baseName.c_str(), NULL);
+    
     /* set the output path member variable */
     input.outputPath = pathName;
 
